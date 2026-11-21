@@ -109,7 +109,8 @@ export async function handleOpenRouterVoice(req, res) {
       }
       res.statusCode = 200;
       res.setHeader('Content-Type', response.headers.get('content-type') || 'audio/mpeg');
-      res.setHeader('Content-Length', response.headers.get('content-length') || '');
+      const contentLength = response.headers.get('content-length');
+      if (contentLength) res.setHeader('Content-Length', contentLength);
       res.setHeader('Cache-Control', 'no-store');
       res.end(Buffer.from(await response.arrayBuffer()));
       return;
