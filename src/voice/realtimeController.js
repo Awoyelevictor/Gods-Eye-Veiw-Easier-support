@@ -361,6 +361,15 @@ export class GevRealtimeController {
     let localStream = null;
     let localPc = null;
     try {
+      localStream = await navigator.mediaDevices.getUserMedia({
+        audio: {
+          echoCancellation: true,
+          noiseSuppression: true,
+          autoGainControl: true,
+          channelCount: 1,
+        },
+      });
+      if (this.abandonStart(epoch, { localStream, localPc })) return;
       const minted = await this.backend.requestToken({ tier: this.voiceTier, signal });
       const token = minted.token;
       if (this.abandonStart(epoch, { localStream, localPc })) return;
@@ -387,15 +396,6 @@ export class GevRealtimeController {
         servedTier: minted.tier || null,
         ratesRecognized: costState.ratesRecognized,
       });
-      localStream = await navigator.mediaDevices.getUserMedia({
-        audio: {
-          echoCancellation: true,
-          noiseSuppression: true,
-          autoGainControl: true,
-          channelCount: 1,
-        },
-      });
-      if (this.abandonStart(epoch, { localStream, localPc })) return;
       this.stream = localStream;
       this.setMicrophoneEnabled(!this.pushToTalkMode || this.pushToTalkKeyHeld);
       this.startVoiceVisualizer(localStream);
